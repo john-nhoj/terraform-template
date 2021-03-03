@@ -1,0 +1,111 @@
+# resource "google_service_account" "default" {
+#   account_id   = "service-account-id"
+#   display_name = "Service Account"
+# }
+
+# resource "google_container_cluster" "primary" {
+#   name     = "johncheng-prod"
+#   location = var.region
+
+#   # We can't create a cluster with no node pool defined, but we want to only use
+#   # separately managed node pools. So we create the smallest possible default
+#   # node pool and immediately delete it.
+#   remove_default_node_pool = true
+#   initial_node_count       = 1
+# }
+
+# resource "google_container_node_pool" "primary_preemptible_nodes" {
+#   name       = "my-node-pool"
+#   location   = var.region
+#   cluster    = google_container_cluster.primary.name
+#   node_count = 1
+
+#   node_config {
+#     preemptible  = true
+#     machine_type = "e2-medium"
+
+#     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
+#     service_account = google_service_account.default.email
+#     oauth_scopes = [
+#       "https://www.googleapis.com/auth/cloud-platform"
+#     ]
+#   }
+# }
+
+# module "gke" {
+#   source                     = "terraform-google-modules/kubernetes-engine/google"
+#   version                    = "4.1.0"
+#   project_id                 = var.project_id
+#   region                     = var.region
+#   zones                      = var.zones
+#   name                       = var.name
+#   network                    = "default"
+#   subnetwork                 = "default"
+#   ip_range_pods              = ""
+#   ip_range_services          = ""
+#   http_load_balancing        = false
+#   horizontal_pod_autoscaling = true
+#   kubernetes_dashboard       = true
+#   network_policy             = true
+
+#   node_pools = [
+#     {
+#       name               = "default-node-pool"
+#       machine_type       = var.machine_type
+#       min_count          = var.min_count
+#       max_count          = var.max_count
+#       disk_size_gb       = var.disk_size_gb
+#       disk_type          = "pd-standard"
+#       image_type         = "COS"
+#       auto_repair        = true
+#       auto_upgrade       = true
+#       service_account    = var.service_account
+#       preemptible        = false
+#       initial_node_count = var.initial_node_count
+#     },
+#   ]
+
+#   node_pools_oauth_scopes = {
+#     all = []
+
+#     default-node-pool = [
+#       "https://www.googleapis.com/auth/cloud-platform",
+#     ]
+#   }
+
+#   node_pools_labels = {
+#     all = {}
+
+#     default-node-pool = {
+#       default-node-pool = true
+#     }
+#   }
+
+#   node_pools_metadata = {
+#     all = {}
+
+#     default-node-pool = {
+#       node-pool-metadata-custom-value = "my-node-pool"
+#     }
+#   }
+
+#   node_pools_taints = {
+#     all = []
+
+#     default-node-pool = [
+#       {
+#         key    = "default-node-pool"
+#         value  = true
+#         effect = "PREFER_NO_SCHEDULE"
+#       },
+#     ]
+#   }
+
+#   node_pools_tags = {
+#     all = []
+
+#     default-node-pool = [
+#       "default-node-pool",
+#     ]
+#   }
+# }
