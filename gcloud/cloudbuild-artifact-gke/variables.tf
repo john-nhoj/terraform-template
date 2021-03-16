@@ -13,3 +13,7 @@ variable "zone" {
 variable "repository_name" {
   description = "Name of the repository for the website"
 }
+
+variable "cluster_name" {
+  description = "Name of the Kubernetes cluster"
+}
